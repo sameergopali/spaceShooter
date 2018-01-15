@@ -8,12 +8,15 @@ import android.opengl.GLSurfaceView;
  */
 
 public class DrawingSurface extends GLSurfaceView {
-    private final  SurfaceRenderer surfaceRender;
+   private final  SurfaceRenderer surfaceRender;
 
     public DrawingSurface(Context context) {
         super(context);
+
         setEGLContextClientVersion(3);
         surfaceRender= new SurfaceRenderer();
         setRenderer(surfaceRender);
+        surfaceRender.setContext(context);
     }
+
 }

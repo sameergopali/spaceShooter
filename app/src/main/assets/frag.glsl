@@ -1,3 +1,4 @@
+#version 300 es
 in vec3 color;
 
 out vec4 colorOut;
