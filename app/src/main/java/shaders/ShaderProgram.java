@@ -3,15 +3,20 @@ package shaders;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
+import android.opengl.Matrix;
 import android.util.Log;
 
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Vector;
+import java.util.regex.Matcher;
 
 import javax.microedition.khronos.opengles.GL11;
 
+import utility.Math3D.Matrix4f;
+import utility.Math3D.Vector3f;
 import utility.TextResourceReader;
 
 import static android.content.ContentValues.TAG;
@@ -45,9 +50,26 @@ public abstract class ShaderProgram {
             return;
         }
         GLES20.glValidateProgram(programID);
+        getAllUniforms();
 
     }
-     public void runProgram(){
+
+    protected abstract void getAllUniforms();
+
+    protected  int getUniformLocation(String uniformName){
+        return GLES20.glGetUniformLocation(programID,uniformName);
+    }
+    protected  void loadFloat(int location, float value){
+        GLES20.glUniform1f(location,value);
+    }
+    protected void loadVector3(int location, Vector3f vec){
+        GLES20.glUniform3f(location,vec.x,vec.y,vec.z);
+    }
+
+    protected void loadMatrix(int location, Matrix4f matrix){
+        GLES20.glUniformMatrix4fv(location,1,false,matrix.getArray(),0);
+    }
+    public void runProgram(){
          GLES20.glUseProgram(programID);
 
      }

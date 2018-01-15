@@ -8,11 +8,14 @@ import android.opengl.GLSurfaceView;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import entity.Entity;
 import model.RawModel;
 import model.TexturedModel;
 import shaders.StaticShader;
 import texture.ModelTexture;
 import utility.FPSCounter;
+import utility.Math3D.Matrix4f;
+import utility.Math3D.Vector3f;
 import utility.TextureResourceReader;
 
 /**
@@ -26,6 +29,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     private RawModel rawModel;
     private ModelTexture modelTexture;
     private TexturedModel model;
+    private Entity entity;
 
     public void setContext(Context context) {
         this.context = context;
@@ -59,6 +63,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
         rawModel=loader.loadtoVAO(vertices,indices,textureCoords);
         modelTexture =new ModelTexture(TextureResourceReader.loadTexturue(context,"tex.png"));
         model =new TexturedModel(rawModel,modelTexture);
+        entity= new Entity(model,new Vector3f(-1.0f,0.0f,0.0f),0,0,0,1);
     }
 
     @Override
@@ -74,6 +79,10 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
         GLES30.glBindVertexArray(model.getRawModel().getVaoID());
         GLES20.glEnableVertexAttribArray(0);
         GLES20.glEnableVertexAttribArray(1);
+
+        Matrix4f modelMatrix = Matrix4f.createTransformationMatrix(entity.getPosition(),entity.getScale(), entity.getRx(),entity.getRy(), entity.getRz());
+        staticShader.loadMatrix(modelMatrix);
+
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,model.getModelTexture().getTextureId());
         GLES20.glDrawElements(GLES20.GL_TRIANGLES,model.getRawModel().getVertexCount(),GLES20.GL_UNSIGNED_INT,0);
