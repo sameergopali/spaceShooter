@@ -25,6 +25,7 @@ public class Loader {
     private static final int BYTES_PER_INT = 2;
     private  final int  BYTES_PER_FLOAT =4;
 
+
     public RawModel loadtoVAO(float[] positions,int [] indicies, float[] textureCoords){
         int vaoID =createVAO();
         bindIndexBuffer(indicies);

@@ -4,10 +4,12 @@ import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import entity.Camera;
 import entity.Entity;
 import model.RawModel;
 import model.TexturedModel;
@@ -17,6 +19,8 @@ import utility.FPSCounter;
 import utility.Math3D.Matrix4f;
 import utility.Math3D.Vector3f;
 import utility.TextureResourceReader;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by sameer on 1/7/2018.
@@ -30,12 +34,27 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     private ModelTexture modelTexture;
     private TexturedModel model;
     private Entity entity;
+    private Renderer renderer;
+    private static int width;
+    private static int height;
+    private Camera camera;
+
+    public Camera getCamera() {
+        return camera;
+    }
+
+
 
     public void setContext(Context context) {
         this.context = context;
     }
 
     private Context context;
+
+
+
+
+
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
@@ -63,32 +82,31 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
         rawModel=loader.loadtoVAO(vertices,indices,textureCoords);
         modelTexture =new ModelTexture(TextureResourceReader.loadTexturue(context,"tex.png"));
         model =new TexturedModel(rawModel,modelTexture);
-        entity= new Entity(model,new Vector3f(-1.0f,0.0f,0.0f),0,0,0,1);
+        entity= new Entity(model,new Vector3f(0.0f,0.0f,-1.0f),0,0,0,1);
+        renderer = new Renderer();
+        camera = new Camera();
+
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
+        renderer.setHeight(height);
+        renderer.setWidth(width);
+        renderer.setProjectionMatrix(staticShader);
+
+
+
 
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+      //  entity.increasePosition(0,0,-0.1f);
+        renderer.prepare();
         staticShader.runProgram();
-        GLES30.glBindVertexArray(model.getRawModel().getVaoID());
-        GLES20.glEnableVertexAttribArray(0);
-        GLES20.glEnableVertexAttribArray(1);
-
-        Matrix4f modelMatrix = Matrix4f.createTransformationMatrix(entity.getPosition(),entity.getScale(), entity.getRx(),entity.getRy(), entity.getRz());
-        staticShader.loadMatrix(modelMatrix);
-
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,model.getModelTexture().getTextureId());
-        GLES20.glDrawElements(GLES20.GL_TRIANGLES,model.getRawModel().getVertexCount(),GLES20.GL_UNSIGNED_INT,0);
-        GLES20.glDisableVertexAttribArray(0);
-        GLES20.glDisableVertexAttribArray(1);
-        GLES30.glBindVertexArray(0);
+        staticShader.loadViewMatrix(camera);
+        renderer.render(entity,staticShader);
         staticShader.stopProgram();
         fps.logFrame();
 
