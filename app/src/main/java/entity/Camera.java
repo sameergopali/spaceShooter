@@ -27,7 +27,7 @@ public class Camera {
         /* TodO *
         implement touchPress/
          */
-        position.z ++;
+        position.z +=0.01f;
 
     }
 
