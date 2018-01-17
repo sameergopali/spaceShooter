@@ -18,6 +18,7 @@ import entity.Light;
 import model.OBJLoader;
 import model.RawModel;
 import model.TexturedModel;
+import shaders.BgShader;
 import shaders.StaticShader;
 import texture.ModelTexture;
 import utility.FPSCounter;
@@ -42,6 +43,9 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     private static int height;
     private Camera camera;
     private Light light;
+
+    private BgShader bgShader;
+    private BgRenderer bgRenderer;
 
     private Map<TexturedModel,List<Entity>> entities = new HashMap<TexturedModel,List<Entity>>();
 
