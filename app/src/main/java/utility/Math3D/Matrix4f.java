@@ -56,4 +56,39 @@ public class Matrix4f {
         return m;
 
     }
+
+    public static Matrix4f createProjectionMatrix(int width, int height){
+         float FOV = 70.0f;
+         float NEAR_PLANE = 0.1f;
+         float FAR_PLANE = 100f;
+        float [] m = new float[16];
+
+        float aspectRatio = (float) width / (float) height;
+        float y_scale = (float) ((1f / Math.tan(Math.toRadians(FOV/2f)))*aspectRatio);
+        float x_scale = y_scale / aspectRatio;
+        float frustum_length = FAR_PLANE - NEAR_PLANE;
+        m[0] =x_scale;
+        m[1] = 0f;
+        m[2] = 0f;
+        m[3] = 0f;
+        m[4] = 0f;
+        m[5] = y_scale;
+        m[6] = 0f;
+        m[7] = 0f;
+        m[8] = 0f;
+        m[9] = 0f;
+        m[10] = -((FAR_PLANE + NEAR_PLANE) / frustum_length);
+        m[11] = -1f;
+
+        m[12] = 0f;
+        m[13] = 0f;
+        m[14] = -((2f * FAR_PLANE * NEAR_PLANE) / (frustum_length));
+        m[15] = 0f;
+
+
+        return  new Matrix4f(m);
+        //projectionMatrix = new Matrix4f();
+    }
+
 }
+
