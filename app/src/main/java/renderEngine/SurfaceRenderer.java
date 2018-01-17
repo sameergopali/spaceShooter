@@ -6,6 +6,11 @@ import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -41,6 +46,8 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     private static int height;
     private Camera camera;
     private Light light;
+
+    private Map<TexturedModel,List<Entity>> entities = new HashMap<TexturedModel,List<Entity>>();
 
     public Camera getCamera() {
         return camera;
@@ -154,10 +161,9 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
         modelTexture.setShineDamper(10);
         model =new TexturedModel(rawModel,modelTexture);
         entity= new Entity(model,new Vector3f(0.0f,-10.0f,-10.0f),0,0,0,1);
-        renderer = new Renderer();
+        renderer = new Renderer(staticShader);
         camera = new Camera();
         light = new Light(new Vector3f(0,100,5),new Vector3f(0.0f,1.0f,1.0f));
-
     }
 
     @Override
@@ -174,14 +180,29 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        entity.increaseRotation(0.0f,0.1f,0.0f);
+       // entity.increaseRotation(0.0f,0.1f,0.0f);
         renderer.prepare();
         staticShader.runProgram();
         staticShader.loadLight(light);
         staticShader.loadViewMatrix(camera);
-        renderer.render(entity,staticShader);
+        processEntity(entity);
+
+        renderer.render(entities);
         staticShader.stopProgram();
+        entities.clear();
         fps.logFrame();
 
+    }
+    public void processEntity(Entity entity){
+        TexturedModel entityModel = entity.getTexturedModel();
+        List<Entity> batch = entities.get(entityModel);
+        if(batch!=null){
+            batch.add(entity);
+        }
+        else {
+            List<Entity> newBatch = new ArrayList<Entity>();
+            newBatch.add(entity);
+            entities.put(entityModel,newBatch);
+        }
     }
 }
