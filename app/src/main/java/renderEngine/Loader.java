@@ -26,12 +26,14 @@ public class Loader {
     private  final int  BYTES_PER_FLOAT =4;
 
 
-    public RawModel loadtoVAO(float[] positions,int [] indicies, float[] textureCoords){
+    public RawModel loadtoVAO(float[] positions,int [] indicies, float[] textureCoords, float[] normals){
         int vaoID =createVAO();
         bindIndexBuffer(indicies);
 
         storeDatainAttribule(0,3,positions);
         storeDatainAttribule(1,2,textureCoords);
+        storeDatainAttribule(2,3,normals);
+
         unbindVao();
         return new RawModel( vaoID, indicies.length);
     }

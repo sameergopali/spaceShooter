@@ -6,7 +6,7 @@ import texture.ModelTexture;
  * Created by sameer on 1/15/2018.
  */
 
-public class TexturedModel {
+public class   TexturedModel {
     public RawModel getRawModel() {
         return rawModel;
     }

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import entity.Entity;
 import shaders.StaticShader;
+import texture.ModelTexture;
 import utility.Math3D.Matrix4f;
 
 import static android.content.ContentValues.TAG;
@@ -49,16 +50,19 @@ public class Renderer {
         GLES30.glBindVertexArray(entity.getTexturedModel().getRawModel().getVaoID());
         GLES20.glEnableVertexAttribArray(0);
         GLES20.glEnableVertexAttribArray(1);
+        GLES20.glEnableVertexAttribArray(2);
 
         Matrix4f modelMatrix = Matrix4f.createTransformationMatrix(entity.getPosition(),entity.getScale(), entity.getRx(),entity.getRy(), entity.getRz());
         staticShader.loadModelMatrix(modelMatrix);
 
-
+        ModelTexture texture = entity.getTexturedModel().getModelTexture();
+        staticShader.loadShineValue(texture.getShineDamper(),texture.getReflectivity() );
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,entity.getTexturedModel().getModelTexture().getTextureId());
         GLES20.glDrawElements(GLES20.GL_TRIANGLES,entity.getTexturedModel().getRawModel().getVertexCount(),GLES20.GL_UNSIGNED_INT,0);
         GLES20.glDisableVertexAttribArray(0);
         GLES20.glDisableVertexAttribArray(1);
+        GLES20.glDisableVertexAttribArray(2);
         GLES30.glBindVertexArray(0);
     }
 

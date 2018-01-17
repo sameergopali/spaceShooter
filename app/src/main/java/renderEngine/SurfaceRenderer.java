@@ -11,6 +11,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import entity.Camera;
 import entity.Entity;
+import entity.Light;
 import model.OBJLoader;
 import model.RawModel;
 import model.TexturedModel;
@@ -39,6 +40,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     private static int width;
     private static int height;
     private Camera camera;
+    private Light light;
 
     public Camera getCamera() {
         return camera;
@@ -60,6 +62,8 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
+        GLES20.glEnable(GLES20.GL_CULL_FACE);
+        GLES20.glCullFace(GLES20.GL_BACK);
         fps = new FPSCounter();
 
 
@@ -146,10 +150,13 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
         loader=new Loader();
         rawModel= OBJLoader.loadObjModel(context ,"stall.obj",loader);
         modelTexture =new ModelTexture(TextureResourceReader.loadTexturue(context,"stallTexture.png"));
+        modelTexture.setReflectivity(1);
+        modelTexture.setShineDamper(10);
         model =new TexturedModel(rawModel,modelTexture);
-        entity= new Entity(model,new Vector3f(0.0f,0.0f,-1.0f),0,0,0,1);
+        entity= new Entity(model,new Vector3f(0.0f,-10.0f,-10.0f),0,0,0,1);
         renderer = new Renderer();
         camera = new Camera();
+        light = new Light(new Vector3f(0,100,5),new Vector3f(0.0f,1.0f,1.0f));
 
     }
 
@@ -167,9 +174,10 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        entity.increaseRotation(0.5f,0.0f,0.0f);
+        entity.increaseRotation(0.0f,0.1f,0.0f);
         renderer.prepare();
         staticShader.runProgram();
+        staticShader.loadLight(light);
         staticShader.loadViewMatrix(camera);
         renderer.render(entity,staticShader);
         staticShader.stopProgram();
