@@ -2,9 +2,7 @@ package renderEngine;
 
 import android.content.Context;
 import android.opengl.GLES20;
-import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,8 +25,6 @@ import utility.Math3D.Matrix4f;
 import utility.Math3D.Vector3f;
 import utility.TextureResourceReader;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * Created by sameer on 1/7/2018.
  */
@@ -41,7 +37,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     private ModelTexture modelTexture;
     private TexturedModel model;
     private Entity entity;
-    private Renderer renderer;
+    private EntityRenderer renderer;
     private static int width;
     private static int height;
     private Camera camera;
@@ -68,6 +64,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glEnable(GLES20.GL_CULL_FACE);
         GLES20.glCullFace(GLES20.GL_BACK);
@@ -161,7 +158,6 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
         modelTexture.setShineDamper(10);
         model =new TexturedModel(rawModel,modelTexture);
         entity= new Entity(model,new Vector3f(0.0f,-10.0f,-10.0f),0,0,0,1);
-        renderer = new Renderer(staticShader);
         camera = new Camera();
         light = new Light(new Vector3f(0,100,5),new Vector3f(0.0f,1.0f,1.0f));
     }
@@ -169,9 +165,8 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
-        renderer.setHeight(height);
-        renderer.setWidth(width);
-        renderer.setProjectionMatrix(staticShader);
+        renderer = new EntityRenderer(staticShader, Matrix4f.createProjectionMatrix(width,height));
+
 
 
 
@@ -181,7 +176,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onDrawFrame(GL10 gl) {
        // entity.increaseRotation(0.0f,0.1f,0.0f);
-        renderer.prepare();
+        prepare();
         staticShader.runProgram();
         staticShader.loadLight(light);
         staticShader.loadViewMatrix(camera);
@@ -204,5 +199,8 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
             newBatch.add(entity);
             entities.put(entityModel,newBatch);
         }
+    }
+    private void prepare(){
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT|GLES20.GL_DEPTH_BUFFER_BIT);
     }
 }

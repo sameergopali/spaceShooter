@@ -28,6 +28,7 @@ public class DrawingSurface extends GLSurfaceView {
         surfaceRender= new SurfaceRenderer();
         setRenderer(surfaceRender);
         surfaceRender.setContext(context);
+        setRenderMode(RENDERMODE_CONTINUOUSLY);
 
     }
     @Override
