@@ -36,21 +36,23 @@ public class Matrix4f {
     }
     public static Matrix4f createTransformationMatrix(Vector3f traslation, float scale,float rx, float ry, float rz){;
         Matrix4f m = new Matrix4f();
+        Matrix4f.translate(traslation,m);
+
         Matrix4f.rotate(rx,new Vector3f(1,0,0),m);
         Matrix4f.rotate(ry,new Vector3f(0,1,0),m);
         Matrix4f.rotate(rz,new Vector3f(0,0,1),m);
-        Matrix4f.translate(traslation,m);
         Matrix4f.scale(new Vector3f(scale,scale,scale),m);
         return m;
 
     }
     public static Matrix4f createViewMatrix(Camera camera){;
         Matrix4f m = new Matrix4f();
-        Matrix4f.rotate(camera.getPitch(),new Vector3f(1,0,0),m);
-        Matrix4f.rotate(camera.getYaw(),new Vector3f(0,1,0),m);
         Vector3f cameraPos = camera.getPosition();
         Vector3f negativeCameraPos= new Vector3f(-cameraPos.x,-cameraPos.y, -cameraPos.z);
         Matrix4f.translate(negativeCameraPos,m);
+        Matrix4f.rotate(camera.getPitch(),new Vector3f(1,0,0),m);
+        Matrix4f.rotate(camera.getYaw(),new Vector3f(0,1,0),m);
+
         return m;
 
     }

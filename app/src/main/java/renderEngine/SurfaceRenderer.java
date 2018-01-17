@@ -11,6 +11,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import entity.Camera;
 import entity.Entity;
+import model.OBJLoader;
 import model.RawModel;
 import model.TexturedModel;
 import shaders.StaticShader;
@@ -143,8 +144,8 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
 
         staticShader = new StaticShader(context);
         loader=new Loader();
-        rawModel=loader.loadtoVAO(vertices,indices,textureCoords);
-        modelTexture =new ModelTexture(TextureResourceReader.loadTexturue(context,"tex.png"));
+        rawModel= OBJLoader.loadObjModel(context ,"stall.obj",loader);
+        modelTexture =new ModelTexture(TextureResourceReader.loadTexturue(context,"stallTexture.png"));
         model =new TexturedModel(rawModel,modelTexture);
         entity= new Entity(model,new Vector3f(0.0f,0.0f,-1.0f),0,0,0,1);
         renderer = new Renderer();

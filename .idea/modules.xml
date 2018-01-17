@@ -3,7 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/spaceShooter.iml" filepath="$PROJECT_DIR$/.idea/spaceShooter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/spaceShooter.iml" filepath="$PROJECT_DIR$/spaceShooter.iml" />
+      <module fileurl="file://C:\Users\VRlab\AndroidStudioProjects\spaceShooter\.idea\spaceShooter.iml" filepath="C:\Users\VRlab\AndroidStudioProjects\spaceShooter\.idea\spaceShooter.iml" />
     </modules>
   </component>
 </project>
