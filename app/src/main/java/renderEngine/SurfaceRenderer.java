@@ -15,6 +15,7 @@ import javax.microedition.khronos.opengles.GL10;
 import entity.Camera;
 import entity.Entity;
 import entity.Light;
+import model.BgModelLoader;
 import model.OBJLoader;
 import model.RawModel;
 import model.TexturedModel;
@@ -37,6 +38,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     private RawModel rawModel;
     private ModelTexture modelTexture;
     private TexturedModel model;
+    private TexturedModel bgModel;
     private Entity entity;
     private EntityRenderer renderer;
     private static int width;
@@ -153,10 +155,11 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
                 23,21,22
 
         };
-
+        bgShader = new BgShader(context);
         staticShader = new StaticShader(context);
         loader=new Loader();
         rawModel= OBJLoader.loadObjModel(context ,"stall.obj",loader);
+        bgModel = new TexturedModel(BgModelLoader.createBgModel(loader), new ModelTexture(TextureResourceReader.loadTexturue(context,"tex.png")));
         modelTexture =new ModelTexture(TextureResourceReader.loadTexturue(context,"stallTexture.png"));
         modelTexture.setReflectivity(1);
         modelTexture.setShineDamper(10);
@@ -164,6 +167,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
         entity= new Entity(model,new Vector3f(0.0f,-10.0f,-10.0f),0,0,0,1);
         camera = new Camera();
         light = new Light(new Vector3f(0,100,5),new Vector3f(0.0f,1.0f,1.0f));
+        bgRenderer = new BgRenderer();
     }
 
     @Override
@@ -181,14 +185,21 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl) {
        // entity.increaseRotation(0.0f,0.1f,0.0f);
         prepare();
+
+        bgShader.runProgram();
+        bgRenderer.render(bgModel);
+        bgShader.stopProgram();
+        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT);
         staticShader.runProgram();
         staticShader.loadLight(light);
         staticShader.loadViewMatrix(camera);
         processEntity(entity);
-
         renderer.render(entities);
         staticShader.stopProgram();
         entities.clear();
+
+
+
         fps.logFrame();
 
     }

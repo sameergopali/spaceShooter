@@ -15,18 +15,12 @@ import texture.ModelTexture;
 
 public class BgRenderer {
 
-     private BgShader bgShader;
 
-
-    public BgRenderer(BgShader bgShader) {
-        this.bgShader = bgShader;
-    }
 
     public void render(TexturedModel texturedModel){
         GLES30.glBindVertexArray(texturedModel.getRawModel().getVaoID());
         GLES20.glEnableVertexAttribArray(0);
         GLES20.glEnableVertexAttribArray(1);
-        GLES20.glEnableVertexAttribArray(2);
         ModelTexture texture = texturedModel.getModelTexture();
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,texturedModel.getModelTexture().getTextureId());
@@ -35,7 +29,6 @@ public class BgRenderer {
 
         GLES20.glDisableVertexAttribArray(0);
         GLES20.glDisableVertexAttribArray(1);
-        GLES20.glDisableVertexAttribArray(2);
         GLES30.glBindVertexArray(0);
 
     }

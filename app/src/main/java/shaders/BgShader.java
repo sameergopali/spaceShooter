@@ -10,8 +10,8 @@ public class BgShader extends ShaderProgram {
     private static final String VERTEX_FILE="bgVertex.glsl";
     private static final String FRAG_FILE= "bgFrag.glsl";
 
-    public BgShader(Context context, String vsResourceID, String fsResourceId) {
-        super(context, vsResourceID, fsResourceId);
+    public BgShader(Context context) {
+        super(context, VERTEX_FILE, FRAG_FILE);
     }
 
     @Override

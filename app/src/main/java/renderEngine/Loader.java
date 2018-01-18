@@ -37,6 +37,18 @@ public class Loader {
         unbindVao();
         return new RawModel( vaoID, indicies.length);
     }
+    public RawModel loadtoVAO(float[] positions,int [] indicies, float[] textureCoords){
+        int vaoID =createVAO();
+        bindIndexBuffer(indicies);
+
+        storeDatainAttribule(0,3,positions);
+        storeDatainAttribule(1,2,textureCoords);
+
+
+        unbindVao();
+        return new RawModel( vaoID, indicies.length);
+    }
+
 
     private void bindIndexBuffer(int[] indicies) {
         int[] vbo = new int[1];
