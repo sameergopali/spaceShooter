@@ -24,6 +24,8 @@ import model.RawModel;
 import model.TexturedModel;
 import shaders.BgShader;
 import shaders.StaticShader;
+import shaders.TerrainShader;
+import terrain.Terrain;
 import texture.ModelTexture;
 import utility.FPSCounter;
 import utility.Math3D.Matrix4f;
@@ -48,7 +50,6 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
     private static int height;
     private ViewCamera camera;
     private Light light;
-
     private BgShader bgShader;
     private BgRenderer bgRenderer;
 
@@ -63,7 +64,10 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
 
     private boolean mUpdateST = false;
 
-
+    private TerrainShader terrainShader ;
+    private  TerrainRenderer terrainRenderer;
+    private  List<Terrain> terrains = new ArrayList<Terrain>();
+    private Terrain terrain ,terrain1;
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -155,20 +159,23 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
         };
         bgShader = new BgShader(context);
         staticShader = new StaticShader(context);
+        terrainShader = new TerrainShader(context);
+
         loader=new Loader();
         rawModel= OBJLoader.loadObjModel(context ,"dragon.obj",loader);
         bgModelTexture =new ModelTexture(TextureResourceReader.loadBgTexture());
         bgModel = new TexturedModel(BgModelLoader.createBgModel(loader),bgModelTexture );
-        modelTexture =new ModelTexture(TextureResourceReader.loadTexturue(context,"white.png"));
-        modelTexture.setReflectivity(1);
+        modelTexture =new ModelTexture(TextureResourceReader.loadTexturue(context,"terrain.png"));
+        modelTexture.setReflectivity(3);
         modelTexture.setShineDamper(10);
         model =new TexturedModel(rawModel,modelTexture);
-        entity= new Entity(model,new Vector3f(0.0f,-10.0f,-10.0f),0,0,0,1);
+        entity= new Entity(model,new Vector3f(0.0f,0.0f,-20.0f),0,0,0,1);
         camera = new ViewCamera();
         light = new Light(new Vector3f(0,100,5),new Vector3f(1.0f,1.0f,1.0f));
         bgRenderer = new BgRenderer(bgShader);
 
-
+        terrain =  new Terrain(0,-10, loader, new ModelTexture(TextureResourceReader.loadTexturue(context,"terrain.png")));
+        terrain1 = new Terrain(1,-1, loader, new ModelTexture(TextureResourceReader.loadTexturue(context,"terrain.png")));
         mSTexture = new SurfaceTexture ( bgModelTexture.getTextureId() );
         mSTexture.setOnFrameAvailableListener(this);
         mCamera = android.hardware.Camera.open();
@@ -177,13 +184,15 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
         } catch ( IOException ioe ) {
         }
 
+
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
-        renderer = new EntityRenderer(staticShader, Matrix4f.createProjectionMatrix(width,height));
-
+        Matrix4f projectionMatrix = Matrix4f.createProjectionMatrix(width,height);
+        renderer = new EntityRenderer(staticShader,projectionMatrix );
+        terrainRenderer= new TerrainRenderer(terrainShader,projectionMatrix);
 
        // android.hardware.Camera.Parameters param = mCamera.getParameters();
        // param.setRotation(90);
@@ -210,10 +219,29 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
         processEntity(entity);
         renderer.render(entities);
         staticShader.stopProgram();
+
+
+        terrainShader.runProgram();
+        terrainShader.loadLight(light);
+        terrainShader.loadViewMatrix(camera);
+        processTerrain(terrain);
+        processTerrain(terrain1);
+
+        terrainShader.stopProgram();
+
+
+
         entities.clear();
+        terrains.clear();
         fps.logFrame();
 
+
     }
+
+    private  void processTerrain( Terrain terrain){
+        terrains.add(terrain);
+    }
+
     public void processEntity(Entity entity){
         TexturedModel entityModel = entity.getTexturedModel();
         List<Entity> batch = entities.get(entityModel);
