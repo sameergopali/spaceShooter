@@ -73,6 +73,11 @@ public abstract class ShaderProgram {
          GLES20.glUseProgram(programID);
 
      }
+     protected void loadInt(int location, int value){
+        GLES20.glUniform1i(location,value);
+     }
+
+
     public void stopProgram(){
         GLES20.glUseProgram(0);
     }

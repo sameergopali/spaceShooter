@@ -15,15 +15,23 @@ public class BgModelLoader {
             1.0f, -1.0f, -1.0f,
             1.0f, 1.0f, -1.0f
     };
+
+      /*float[] vertices = { 1.0f, -1.0f,0.0f,
+                            -1.0f, -1.0f,0.0f,
+                            1.0f, 1.0f,0.0f
+                        -1.0f, 1.0f,0.0f };*/
     int [] indices ={
             0,1,3,
             3,1,2
     };
     float[] textureCoords={
-            0,0,
             0,1,
+
             1,1,
-            1,0
+            1,0,
+
+            0,0
+
 
     };
 

@@ -2,13 +2,9 @@ package renderEngine;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 
-import entity.Camera;
-
-import static android.content.ContentValues.TAG;
+import entity.ViewCamera;
 
 /**
  * Created by sameer on 1/7/2018.
@@ -16,7 +12,7 @@ import static android.content.ContentValues.TAG;
 
 public class DrawingSurface extends GLSurfaceView {
    private final  SurfaceRenderer surfaceRender;
-   private Camera camera;
+   private ViewCamera camera;
     private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
     private float mPreviousX;
     private float mPreviousY;

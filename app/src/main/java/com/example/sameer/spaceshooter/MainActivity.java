@@ -9,6 +9,7 @@ import android.util.Log;
 
 import renderEngine.DrawingSurface;
 import renderEngine.SurfaceRenderer;
+import utility.CameraPermissionHelper;
 
 public class MainActivity extends AppCompatActivity {
     private final int CONTEXT_CLIENT_VERSION = 3;
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         DrawingSurface display;
 
+        CameraPermissionHelper.requestCameraPermission(this);
         if ( detectOpenGLES30() )
         {
             display = new DrawingSurface(this);

@@ -1,9 +1,8 @@
 package shaders;
 
 import android.content.Context;
-import android.content.Intent;
 
-import entity.Camera;
+import entity.ViewCamera;
 import entity.Light;
 import utility.Math3D.Matrix4f;
 
@@ -47,7 +46,7 @@ public class StaticShader extends ShaderProgram {
         super.loadMatrix(projectionMatrix, matrix);
     }
 
-    public void loadViewMatrix(Camera camera){
+    public void loadViewMatrix(ViewCamera camera){
 
         Matrix4f matrix=Matrix4f.createViewMatrix(camera);
         super.loadMatrix(viewMatrix, matrix);

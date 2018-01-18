@@ -16,14 +16,15 @@ vec3 unitLightVetor  = normalize(toLightVector);
 vec3 unitCameraVector = normalize(toCameraVector);
 
 float nDot1 = dot(unitNormal,unitLightVetor);
-float brightness = max(nDot1,0.8);
+float brightness = max(nDot1,0.2);
 vec3 diffuse = brightness * lightColor;
 vec3 lightDirection = - unitLightVetor;
 vec3 reflectedLightDirection = reflect(lightDirection, unitNormal);
 
 float specularFactor = dot(reflectedLightDirection, unitCameraVector);
-float dampedFactor = pow(specularFactor,shineDamper);
+float specular = max(specularFactor,0.0);
+float dampedFactor = pow(specular,shineDamper);
 vec3 finalSpecular  = dampedFactor * reflectivity*lightColor;
 
-colorOut = vec4(diffuse,1.0)*texture(textureSampler,color);// + vec4(finalSpecular,1.0);
+colorOut = vec4(diffuse,1.0)*texture(textureSampler,color) + vec4(finalSpecular,1.0);
  }

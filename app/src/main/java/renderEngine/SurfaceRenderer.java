@@ -1,9 +1,12 @@
 package renderEngine;
 
 import android.content.Context;
+import android.graphics.Camera;
+import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +15,7 @@ import java.util.Map;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import entity.Camera;
+import entity.ViewCamera;
 import entity.Entity;
 import entity.Light;
 import model.BgModelLoader;
@@ -31,7 +34,7 @@ import utility.TextureResourceReader;
  * Created by sameer on 1/7/2018.
  */
 
-public class SurfaceRenderer implements GLSurfaceView.Renderer {
+public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.OnFrameAvailableListener {
     private  FPSCounter fps;
     private  Loader loader;
     private StaticShader staticShader;
@@ -43,27 +46,22 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     private EntityRenderer renderer;
     private static int width;
     private static int height;
-    private Camera camera;
+    private ViewCamera camera;
     private Light light;
 
     private BgShader bgShader;
     private BgRenderer bgRenderer;
 
     private Map<TexturedModel,List<Entity>> entities = new HashMap<TexturedModel,List<Entity>>();
+    private ModelTexture bgModelTexture;
 
-    public Camera getCamera() {
-        return camera;
-    }
-
-
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
 
     private Context context;
 
+    private SurfaceTexture mSTexture;
+    private android.hardware.Camera mCamera;
 
+    private boolean mUpdateST = false;
 
 
 
@@ -158,16 +156,27 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
         bgShader = new BgShader(context);
         staticShader = new StaticShader(context);
         loader=new Loader();
-        rawModel= OBJLoader.loadObjModel(context ,"stall.obj",loader);
-        bgModel = new TexturedModel(BgModelLoader.createBgModel(loader), new ModelTexture(TextureResourceReader.loadTexturue(context,"tex.png")));
-        modelTexture =new ModelTexture(TextureResourceReader.loadTexturue(context,"stallTexture.png"));
+        rawModel= OBJLoader.loadObjModel(context ,"dragon.obj",loader);
+        bgModelTexture =new ModelTexture(TextureResourceReader.loadBgTexture());
+        bgModel = new TexturedModel(BgModelLoader.createBgModel(loader),bgModelTexture );
+        modelTexture =new ModelTexture(TextureResourceReader.loadTexturue(context,"white.png"));
         modelTexture.setReflectivity(1);
         modelTexture.setShineDamper(10);
         model =new TexturedModel(rawModel,modelTexture);
         entity= new Entity(model,new Vector3f(0.0f,-10.0f,-10.0f),0,0,0,1);
-        camera = new Camera();
-        light = new Light(new Vector3f(0,100,5),new Vector3f(0.0f,1.0f,1.0f));
-        bgRenderer = new BgRenderer();
+        camera = new ViewCamera();
+        light = new Light(new Vector3f(0,100,5),new Vector3f(1.0f,1.0f,1.0f));
+        bgRenderer = new BgRenderer(bgShader);
+
+
+        mSTexture = new SurfaceTexture ( bgModelTexture.getTextureId() );
+        mSTexture.setOnFrameAvailableListener(this);
+        mCamera = android.hardware.Camera.open();
+        try {
+            mCamera.setPreviewTexture(mSTexture);
+        } catch ( IOException ioe ) {
+        }
+
     }
 
     @Override
@@ -176,16 +185,21 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
         renderer = new EntityRenderer(staticShader, Matrix4f.createProjectionMatrix(width,height));
 
 
-
-
-
+       // android.hardware.Camera.Parameters param = mCamera.getParameters();
+       // param.setRotation(90);
+       // mCamera.setParameters ( param );
+        mCamera.startPreview();
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
-       // entity.increaseRotation(0.0f,0.1f,0.0f);
+        entity.increaseRotation(0.0f,0.1f,0.0f);
         prepare();
-
+        synchronized(this) {
+            if ( mUpdateST ) {
+                mSTexture.updateTexImage();
+                mUpdateST = false;
+            }}
         bgShader.runProgram();
         bgRenderer.render(bgModel);
         bgShader.stopProgram();
@@ -197,9 +211,6 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
         renderer.render(entities);
         staticShader.stopProgram();
         entities.clear();
-
-
-
         fps.logFrame();
 
     }
@@ -218,4 +229,17 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer {
     private void prepare(){
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT|GLES20.GL_DEPTH_BUFFER_BIT);
     }
+
+    @Override
+    public  synchronized  void onFrameAvailable(SurfaceTexture surfaceTexture) {
+        mUpdateST = true;
+    }
+    public ViewCamera getCamera() {
+        return camera;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
 }

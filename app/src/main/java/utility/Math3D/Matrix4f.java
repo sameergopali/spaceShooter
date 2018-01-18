@@ -2,7 +2,7 @@ package utility.Math3D;
 
 import android.opengl.Matrix;
 
-import entity.Camera;
+import entity.ViewCamera;
 
 /**
  * Created by sameer on 1/15/2018.
@@ -45,7 +45,7 @@ public class Matrix4f {
         return m;
 
     }
-    public static Matrix4f createViewMatrix(Camera camera){;
+    public static Matrix4f createViewMatrix(ViewCamera camera){;
         Matrix4f m = new Matrix4f();
         Vector3f cameraPos = camera.getPosition();
         Vector3f negativeCameraPos= new Vector3f(-cameraPos.x,-cameraPos.y, -cameraPos.z);

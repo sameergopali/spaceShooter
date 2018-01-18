@@ -1,11 +1,14 @@
 #version 300 es
+#extension GL_OES_EGL_image_external_essl3 : require
+
+precision mediump float;
 in vec2 color;
 
 out vec4 colorOut;
-uniform sampler2D textureSampler;
+uniform samplerExternalOES sTexture;
 
 
 void main(void){
-colorOut = texture(textureSampler,color);
+colorOut = texture(sTexture,color);
 
    }
