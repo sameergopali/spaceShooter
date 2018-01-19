@@ -5,6 +5,7 @@ import android.content.Context;
 import entity.ViewCamera;
 import entity.Light;
 import utility.Math3D.Matrix4f;
+import utility.Math3D.Vector3f;
 
 /**
  * Created by sameer on 1/15/2018.
@@ -22,6 +23,7 @@ public class StaticShader extends ShaderProgram {
     private int lightColor;
     private int  shineDamper;
     private int  reflectivity;
+    private  int skyColor;
 
     public StaticShader(Context context){
         super(context,VERTEX_FILE,FRAG_FILE);
@@ -37,6 +39,8 @@ public class StaticShader extends ShaderProgram {
        lightPosition = super.getUniformLocation("lightPosition");
        shineDamper = super.getUniformLocation("shineDamper");
        reflectivity = super.getUniformLocation("reflectivity");
+
+       skyColor = super.getUniformLocation("skyColor");
     }
     public void loadModelMatrix(Matrix4f matrix){
        super.loadMatrix(modelMatrix,matrix);
@@ -64,5 +68,9 @@ public class StaticShader extends ShaderProgram {
     public void loadLight(Light light){
         super.loadVector3(lightColor,light.getColor());
         super.loadVector3(lightPosition,light.getPosition());
+    }
+    public void loadSkyColor(float r, float g, float b ){
+        super.loadVector3(skyColor,new Vector3f(r,g,b));
+
     }
 }

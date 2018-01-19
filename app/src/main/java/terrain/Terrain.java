@@ -2,7 +2,8 @@ package terrain;
 
 import model.RawModel;
 import renderEngine.Loader;
-import texture.ModelTexture;
+import texture.TerrainTexture;
+import texture.TerrainTexturePack;
 
 /**
  * Created by VRlab on 1/18/2018.
@@ -18,7 +19,20 @@ public class Terrain {
 
 
     private RawModel model;
-    private ModelTexture texture;
+
+    public TerrainTexturePack getTexturePack() {
+        return texturePack;
+    }
+
+    public TerrainTexture getBlendMap() {
+        return blendMap;
+    }
+
+    private TerrainTexturePack texturePack;
+    private TerrainTexture blendMap;
+
+
+
 
     public float getX() {
         return x;
@@ -32,12 +46,10 @@ public class Terrain {
         return model;
     }
 
-    public ModelTexture getTexture() {
-        return texture;
-    }
 
-    public Terrain(int gridX, int gridZ, Loader loader, ModelTexture texture){
-         this.texture = texture;
+    public Terrain(int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, TerrainTexture blendMap){
+         this.blendMap = blendMap;
+         this.texturePack =texturePack;
          this.x = gridX*SIZE;
          this.z = gridZ * SIZE;
          this.model = generateTerrain(loader);

@@ -1,7 +1,6 @@
 package renderEngine;
 
 import android.content.Context;
-import android.graphics.Camera;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
@@ -27,6 +26,8 @@ import shaders.StaticShader;
 import shaders.TerrainShader;
 import terrain.Terrain;
 import texture.ModelTexture;
+import texture.TerrainTexture;
+import texture.TerrainTexturePack;
 import utility.FPSCounter;
 import utility.Math3D.Matrix4f;
 import utility.Math3D.Vector3f;
@@ -37,6 +38,12 @@ import utility.TextureResourceReader;
  */
 
 public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.OnFrameAvailableListener {
+
+    private static final float RED =0.5f;
+    private static  final float GREEN = 0.5f;
+    private  static  final float BLUE =0.5f;
+
+
     private  FPSCounter fps;
     private  Loader loader;
     private StaticShader staticShader;
@@ -71,7 +78,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        GLES20.glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+        GLES20.glClearColor(RED, GREEN, BLUE, 1.0f);
 
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glEnable(GLES20.GL_CULL_FACE);
@@ -165,7 +172,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
         rawModel= OBJLoader.loadObjModel(context ,"dragon.obj",loader);
         bgModelTexture =new ModelTexture(TextureResourceReader.loadBgTexture());
         bgModel = new TexturedModel(BgModelLoader.createBgModel(loader),bgModelTexture );
-        modelTexture =new ModelTexture(TextureResourceReader.loadTexturue(context,"terrain.png"));
+        modelTexture =new ModelTexture(TextureResourceReader.loadTexture(context,"mud.png"));
         modelTexture.setReflectivity(3);
         modelTexture.setShineDamper(10);
         model =new TexturedModel(rawModel,modelTexture);
@@ -174,8 +181,24 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
         light = new Light(new Vector3f(0,100,5),new Vector3f(1.0f,1.0f,1.0f));
         bgRenderer = new BgRenderer(bgShader);
 
-        terrain =  new Terrain(0,-10, loader, new ModelTexture(TextureResourceReader.loadTexturue(context,"terrain.png")));
-        terrain1 = new Terrain(1,-1, loader, new ModelTexture(TextureResourceReader.loadTexturue(context,"terrain.png")));
+
+
+
+        TerrainTexture background = new TerrainTexture(TextureResourceReader.loadTexture(context,"terrain.png"));
+        TerrainTexture rTexture = new TerrainTexture(TextureResourceReader.loadTexture(context,"mud.png"));
+        TerrainTexture gTexture = new TerrainTexture(TextureResourceReader.loadTexture(context,"grassFlowers.png"));
+        TerrainTexture bTexture = new TerrainTexture(TextureResourceReader.loadTexture(context,"white.png"));
+
+        TerrainTexture blendMap = new TerrainTexture(TextureResourceReader.loadTexture(context,"blendMap.png"));
+
+        TerrainTexturePack terrainTexturePack = new TerrainTexturePack(background,rTexture,gTexture,bTexture);
+
+        terrain =  new Terrain(0,-1, loader, terrainTexturePack,blendMap );
+        terrain1 = new Terrain(-1,-1, loader, terrainTexturePack,blendMap);
+
+
+
+
         mSTexture = new SurfaceTexture ( bgModelTexture.getTextureId() );
         mSTexture.setOnFrameAvailableListener(this);
         mCamera = android.hardware.Camera.open();
@@ -204,16 +227,17 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
     public void onDrawFrame(GL10 gl) {
         entity.increaseRotation(0.0f,0.1f,0.0f);
         prepare();
-        synchronized(this) {
+        /*synchronized(this) {
             if ( mUpdateST ) {
                 mSTexture.updateTexImage();
                 mUpdateST = false;
             }}
         bgShader.runProgram();
         bgRenderer.render(bgModel);
-        bgShader.stopProgram();
-        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT);
+        bgShader.stopProgram();*/
+        //GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT);
         staticShader.runProgram();
+        staticShader.loadSkyColor(RED,GREEN,BLUE);
         staticShader.loadLight(light);
         staticShader.loadViewMatrix(camera);
         processEntity(entity);
@@ -224,9 +248,10 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
         terrainShader.runProgram();
         terrainShader.loadLight(light);
         terrainShader.loadViewMatrix(camera);
+        terrainShader.loadSkyColor(RED,GREEN,BLUE);
         processTerrain(terrain);
         processTerrain(terrain1);
-
+        terrainRenderer.render(terrains);
         terrainShader.stopProgram();
 
 

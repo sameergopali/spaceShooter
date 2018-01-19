@@ -9,7 +9,7 @@ import utility.Math3D.Vector3f;
 
 public class ViewCamera {
 
-    private Vector3f position = new Vector3f(0,10,0);
+    private Vector3f position = new Vector3f(0,5,0);
     private float pitch =0;
     private float yaw =0;
     private float roll =0;
@@ -27,7 +27,7 @@ public class ViewCamera {
         /* TodO *
         implement touchPress/
          */
-        position.z +=0.01f;
+        position.z -=0.05f;
 
     }
 

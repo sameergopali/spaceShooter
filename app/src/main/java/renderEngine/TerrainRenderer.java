@@ -12,6 +12,7 @@ import model.TexturedModel;
 import shaders.TerrainShader;
 import terrain.Terrain;
 import texture.ModelTexture;
+import texture.TerrainTexturePack;
 import utility.Math3D.Matrix4f;
 import utility.Math3D.Vector3f;
 
@@ -26,6 +27,8 @@ public class TerrainRenderer {
         this.terrainShader = terrainShader;
         terrainShader.runProgram();
         terrainShader.loadProjectionMatrix(projectionMatrix);
+        terrainShader.connectTextureUnits();
+
         terrainShader.stopProgram();
     }
 
@@ -39,16 +42,32 @@ public class TerrainRenderer {
 
     }
 
+
+    private void bindTextures(Terrain terrain){
+        TerrainTexturePack terrainTexturePack = terrain.getTexturePack();
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,terrainTexturePack.getBackground().getTextureID());
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,terrainTexturePack.getrTexture().getTextureID());
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,terrainTexturePack.getgTexture().getTextureID());
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE3);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,terrainTexturePack.getbTexture().getTextureID());
+
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE4);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,terrain.getBlendMap().getTextureID());
+
+    }
+
     private void prepareTerrain(Terrain terrain ){
         RawModel rawModel =terrain.getModel();
         GLES30.glBindVertexArray(rawModel.getVaoID());
         GLES20.glEnableVertexAttribArray(0);
         GLES20.glEnableVertexAttribArray(1);
         GLES20.glEnableVertexAttribArray(2);
-        ModelTexture texture = terrain.getTexture();
-        terrainShader.loadShineValue(texture.getShineDamper(), texture.getReflectivity());
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,texture.getTextureId());
+        bindTextures(terrain);
+        terrainShader.loadShineValue(1 ,0);
+
 
     }
     private void unbindTextureModel(){
