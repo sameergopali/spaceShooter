@@ -21,31 +21,31 @@ import static android.content.ContentValues.TAG;
  */
 
 public class TextureResourceReader {
-    public  static int loadTexture(Context context, String filename){
-        int[] texturehandle = new int[1];
-        GLES20.glGenTextures(1,texturehandle,0);
+
+
+    private static Bitmap getBitmap(Context context, String filename){
         InputStream is = null;
         Bitmap bitmap = null;
         try {
             is = context.getAssets().open(filename);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inScaled = false;
-            bitmap = BitmapFactory.decodeStream(is, null, options);
+
         }
         catch (final IOException e)
         {
             bitmap = null;
             Log.e(TAG, "FAILED TO get getBitmapFromAsset: " + e.getMessage());
         }
-        finally
-        {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException ignored) {
-                }
-            }
-        }
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        bitmap = BitmapFactory.decodeStream(is, null, options);
+        return bitmap;
+
+    }
+
+    public  static int loadTexture(Context context, String filename){
+        int[] texturehandle = new int[1];
+        GLES20.glGenTextures(1,texturehandle,0);
+       Bitmap bitmap = getBitmap(context,filename);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,texturehandle[0]);
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,bitmap,0);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_LINEAR);
@@ -54,6 +54,7 @@ public class TextureResourceReader {
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
         bitmap.recycle();
         return texturehandle[0];
+
 }
 
 public static int loadBgTexture(){
@@ -67,4 +68,23 @@ public static int loadBgTexture(){
 
     return  hTex[0];
 }
+public static int loadCubeMap(Context context,String[] textureFiles){
+    int[] texturehandle = new int[1];
+    GLES20.glGenTextures(1,texturehandle,0);
+    GLES20.glBindTexture(GLES20.GL_TEXTURE_CUBE_MAP, texturehandle[0]);
+
+
+    for(int i =0; i< textureFiles.length; i++){
+        Bitmap bitmap=getBitmap(context,textureFiles[i]);
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_CUBE_MAP_POSITIVE_X+i,0,bitmap,0);
+        bitmap.recycle();
+
+    }
+    GLES20.glTexParameteri(GLES20.GL_TEXTURE_CUBE_MAP,GLES20.GL_TEXTURE_MIN_FILTER,GLES20.GL_LINEAR);
+    GLES20.glTexParameteri(GLES20.GL_TEXTURE_CUBE_MAP,GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+     //GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,0);
+
+     return texturehandle[0];
+}
+
 }
