@@ -24,6 +24,7 @@ import model.TexturedModel;
 import shaders.BgShader;
 import shaders.StaticShader;
 import shaders.TerrainShader;
+import skyBox.SkyboxRenderer;
 import terrain.Terrain;
 import texture.ModelTexture;
 import texture.TerrainTexture;
@@ -75,6 +76,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
     private  TerrainRenderer terrainRenderer;
     private  List<Terrain> terrains = new ArrayList<Terrain>();
     private Terrain terrain ,terrain1;
+    private SkyboxRenderer skyboxRenderer;
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -85,39 +87,6 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
         GLES20.glCullFace(GLES20.GL_BACK);
         fps = new FPSCounter();
 
-
-        float[] vertices = {
-                -0.5f,0.5f,-0.5f,
-                -0.5f,-0.5f,-0.5f,
-                0.5f,-0.5f,-0.5f,
-                0.5f,0.5f,-0.5f,
-
-                -0.5f,0.5f,0.5f,
-                -0.5f,-0.5f,0.5f,
-                0.5f,-0.5f,0.5f,
-                0.5f,0.5f,0.5f,
-
-                0.5f,0.5f,-0.5f,
-                0.5f,-0.5f,-0.5f,
-                0.5f,-0.5f,0.5f,
-                0.5f,0.5f,0.5f,
-
-                -0.5f,0.5f,-0.5f,
-                -0.5f,-0.5f,-0.5f,
-                -0.5f,-0.5f,0.5f,
-                -0.5f,0.5f,0.5f,
-
-                -0.5f,0.5f,0.5f,
-                -0.5f,0.5f,-0.5f,
-                0.5f,0.5f,-0.5f,
-                0.5f,0.5f,0.5f,
-
-                -0.5f,-0.5f,0.5f,
-                -0.5f,-0.5f,-0.5f,
-                0.5f,-0.5f,-0.5f,
-                0.5f,-0.5f,0.5f
-
-        };
 
         float[] textureCoords = {
 
@@ -177,7 +146,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
         modelTexture.setShineDamper(10);
         model =new TexturedModel(rawModel,modelTexture);
         entity= new Entity(model,new Vector3f(0.0f,0.0f,-20.0f),0,0,0,1);
-        camera = new ViewCamera();
+        camera = new ViewCamera(entity);
         light = new Light(new Vector3f(0,100,5),new Vector3f(1.0f,1.0f,1.0f));
         bgRenderer = new BgRenderer(bgShader);
 
@@ -187,7 +156,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
         TerrainTexture background = new TerrainTexture(TextureResourceReader.loadTexture(context,"terrain.png"));
         TerrainTexture rTexture = new TerrainTexture(TextureResourceReader.loadTexture(context,"mud.png"));
         TerrainTexture gTexture = new TerrainTexture(TextureResourceReader.loadTexture(context,"grassFlowers.png"));
-        TerrainTexture bTexture = new TerrainTexture(TextureResourceReader.loadTexture(context,"white.png"));
+        TerrainTexture bTexture = new TerrainTexture(TextureResourceReader.loadTexture(context,"path.png"));
 
         TerrainTexture blendMap = new TerrainTexture(TextureResourceReader.loadTexture(context,"blendMap.png"));
 
@@ -216,7 +185,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
         Matrix4f projectionMatrix = Matrix4f.createProjectionMatrix(width,height);
         renderer = new EntityRenderer(staticShader,projectionMatrix );
         terrainRenderer= new TerrainRenderer(terrainShader,projectionMatrix);
-
+        skyboxRenderer = new SkyboxRenderer(context,loader,projectionMatrix);
        // android.hardware.Camera.Parameters param = mCamera.getParameters();
        // param.setRotation(90);
        // mCamera.setParameters ( param );
@@ -225,7 +194,7 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        entity.increaseRotation(0.0f,0.1f,0.0f);
+       //entity.increaseRotation(0.0f,0.1f,0.0f);
         prepare();
         /*synchronized(this) {
             if ( mUpdateST ) {
@@ -253,12 +222,12 @@ public class SurfaceRenderer implements GLSurfaceView.Renderer,SurfaceTexture.On
         processTerrain(terrain1);
         terrainRenderer.render(terrains);
         terrainShader.stopProgram();
-
-
+         skyboxRenderer.render(camera,RED,GREEN,BLUE);
 
         entities.clear();
         terrains.clear();
         fps.logFrame();
+        fps.logTime();
 
 
     }

@@ -60,11 +60,11 @@ public class Matrix4f {
     public static Matrix4f createProjectionMatrix(int width, int height){
          float FOV = 70.0f;
          float NEAR_PLANE = 0.1f;
-         float FAR_PLANE = 100f;
+         float FAR_PLANE = 500f;
         float [] m = new float[16];
 
         float aspectRatio = (float) width / (float) height;
-        float y_scale = (float) ((1f / Math.tan(Math.toRadians(FOV/2f)))*aspectRatio);
+        float y_scale = (float) ((1f / Math.tan(Math.toRadians(FOV/2f))));
         float x_scale = y_scale / aspectRatio;
         float frustum_length = FAR_PLANE - NEAR_PLANE;
         m[0] =x_scale;

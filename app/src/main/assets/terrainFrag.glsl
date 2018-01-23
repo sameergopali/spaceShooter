@@ -24,7 +24,7 @@ void main(void){
 
    float backTextureAmount = 1.0 - (blendMapColor.r+ blendMapColor.g +blendMapColor.b);
    vec2 tileCoord = color* 40.0;
-   vec4 backTextureColor = texture(backgroundSampler,tileCoord ) *0.0;//*backTextureAmount;
+   vec4 backTextureColor = texture(backgroundSampler,tileCoord ) *backTextureAmount;
 
 
    vec4 rTextureColor = texture(rTexture,tileCoord) * blendMapColor.r;
@@ -32,7 +32,7 @@ void main(void){
    vec4 bTextureColor = texture(bTexture,tileCoord)*blendMapColor.b;
 
 
-   vec4 totalColor =backTextureColor+bTextureColor;
+   vec4 totalColor =backTextureColor+bTextureColor+rTextureColor+gTextureColor;
 
 vec3 unitNormal = normalize(surfaceNormal);
 vec3 unitLightVetor  = normalize(toLightVector);

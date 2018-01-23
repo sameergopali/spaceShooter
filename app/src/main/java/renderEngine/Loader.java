@@ -50,6 +50,13 @@ public class Loader {
     }
 
 
+    public RawModel loadtoVAO(float[] positions,int dimensions){
+        int vaoID =createVAO();
+        storeDatainAttribule(0,dimensions,positions);
+        unbindVao();
+        return new RawModel( vaoID, positions.length/dimensions);
+    }
+
     private void bindIndexBuffer(int[] indicies) {
         int[] vbo = new int[1];
         GLES20.glGenBuffers(1,vbo,0);

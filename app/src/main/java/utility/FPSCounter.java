@@ -7,9 +7,20 @@ import android.util.Log;
  */
 
 public class FPSCounter {
-    long startTime = System.nanoTime();
-    int frames = 0;
 
+    long startTime ;
+    long lastTime;
+    int frames;
+    private static float delta;
+    public FPSCounter(){
+        startTime= System.nanoTime();
+        lastTime = System.nanoTime();
+        frames = 0;
+    }
+
+    public static float getTime(){
+        return  delta;
+    }
     public void logFrame() {
         frames++;
         if(System.nanoTime() - startTime >= 1000000000) {
@@ -17,5 +28,11 @@ public class FPSCounter {
             frames = 0;
             startTime = System.nanoTime();
         }
+    }
+    public   void  logTime(){
+        Log.d("FPSCounter", "delta: " + delta);
+        delta = (System.nanoTime() -lastTime)/1000000000f;
+        lastTime = System.nanoTime();
+
     }
 }
